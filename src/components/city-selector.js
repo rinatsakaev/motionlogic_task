@@ -6,7 +6,12 @@ function CitySelector() {
     const cities = useContext(SelectorContext);
     const [selectedCitiesList, changeSelectedCitiesList] = useSessionState('list', []);
     const [selectedCity, setSelectedCity] = useState(undefined);
-    const [predictedCities, setPredictedCities] = useState([]);
+    const [predictedCities, _setPredictedCities] = useState([]);
+    const predictedCitiesRef = useRef(predictedCities);
+    const setPredictedCities = (x) => {
+      predictedCitiesRef.current = x;
+      _setPredictedCities(x);
+    };
 
     const inputRef = useRef(null);
 
@@ -24,15 +29,13 @@ function CitySelector() {
 
     const handleInput = (e) => {
         if (inputRef.current.value.length < 3) {
-            if (predictedCities.length)
+            if (predictedCitiesRef.current.length)
                 setPredictedCities([]);
             return;
         }
 
         if (inputRef.current.value.length > 3 && e.inputType === 'insertText') {
-            setPredictedCities((prevState) =>
-                prevState.filter(x => x.name.startsWith(inputRef.current.value))
-            );
+            setPredictedCities(predictedCitiesRef.current.filter(x => x.name.startsWith(inputRef.current.value)));
             return;
         }
 
@@ -40,22 +43,22 @@ function CitySelector() {
     };
 
     const handleKeyPress = (e) => {
-        console.log(predictedCities);
-        if (predictedCities.length === 0)
+        if (predictedCitiesRef.current.length === 0 || (e.key !==  'ArrowUp'&& e.key !== 'ArrowDown'))
             return;
-        if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !selectedCity)
-            setSelectedCity(predictedCities[0]);
 
-        const selectedCityIndex = predictedCities.findIndex(x => x.id === selectedCity.id);
-        if (e.key === 'ArrowUp'){
-            console.log('up');
-            setSelectedCity(predictedCities[(selectedCityIndex + 1) % predictedCities.length]);
+        if (!selectedCity){
+            setSelectedCity(predictedCitiesRef.current[0]);
+            return;
         }
-        if (e.key === 'ArrowDown'){
-            console.log('down');
-            setSelectedCity(predictedCities[(selectedCityIndex - 1) % predictedCities.length]);
 
-        }
+        const selectedCityIndex = predictedCitiesRef.current.findIndex(x => x.id === selectedCity.id);
+        if (e.key === 'ArrowUp')
+            setSelectedCity(predictedCitiesRef.current[(selectedCityIndex + 1) % predictedCitiesRef.current.length]);
+
+        if (e.key === 'ArrowDown')
+            setSelectedCity(predictedCitiesRef.current[(selectedCityIndex - 1) % predictedCitiesRef.current.length]);
+        
+
     };
 
     useEffect(() => {
