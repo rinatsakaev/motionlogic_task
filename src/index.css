@@ -32,7 +32,7 @@
     cursor: pointer;
 }
 
-.city-selector__item:hover {
+.city-selector__item:hover, .hover {
     color: white;
     background-color: mediumslateblue;
 }
