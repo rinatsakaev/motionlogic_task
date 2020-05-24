@@ -5,83 +5,71 @@ import useSessionState from '../hooks/session-state';
 function CitySelector() {
     const cities = useContext(SelectorContext);
     const [selectedCitiesList, changeSelectedCitiesList] = useSessionState('list', []);
-
-    const [activeCity, _setActiveCity] = useState(undefined);
-    const activeCityRef = useRef(activeCity);
-    const setActiveCity = (x) => {
-        activeCityRef.current = x;
-        _setActiveCity(x);
-    };
-
-    const [predictedCities, _setPredictedCities] = useState([]);
-    const predictedCitiesRef = useRef(predictedCities);
-    const setPredictedCities = (x) => {
-        predictedCitiesRef.current = x;
-        _setPredictedCities(x);
-    };
-
-    const inputRef = useRef(null);
+    const [inputData, setInputData] = useState('');
+    const [activeCity, setActiveCity] = useState(undefined);
+    const [predictedCities, setPredictedCities] = useState([]);
 
     const addCityToList = () => {
         if (!activeCity || selectedCitiesList.findIndex(x => x.id === activeCity.id) !== -1)
             return;
+
         changeSelectedCitiesList((prevState) => [...prevState, activeCity]);
         setPredictedCities([]);
-        inputRef.current.value = '';
+        setInputData('');
     };
 
     const selectCity = (id, name) => {
         setActiveCity({id, name});
+        setInputData(name);
     };
 
-    const handleInput = (e) => {
-        if (inputRef.current.value.length < 3) {
-            if (predictedCitiesRef.current.length)
+    useEffect(() => {
+        if (inputData.length < 3) {
+            if (predictedCities.length)
                 setPredictedCities([]);
+            if (activeCity)
+                setActiveCity(undefined);
             return;
         }
 
-        if (inputRef.current.value.length > 3 && e.inputType === 'insertText') {
-            setPredictedCities(predictedCitiesRef.current.filter(x => x.name.startsWith(inputRef.current.value)));
+        setPredictedCities(cities.filter(x => x.name.startsWith(inputData)));
+    }, [inputData]);
+
+    const handleKeyDown = (e) => {
+        if (predictedCities.length === 0 ||
+            (e.key !== 'ArrowUp' && e.key !== 'ArrowDown' && e.key !== 'Enter'))
+            return;
+
+        if (!activeCity) {
+            setActiveCity(predictedCities[0]);
             return;
         }
 
-        setPredictedCities(cities.filter(x => x.name.startsWith(inputRef.current.value)));
-    };
+        if (e.key === 'Enter')
+            addCityToList();
 
-    const handleKeyPress = (e) => {
-        if (predictedCitiesRef.current.length === 0 || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown'))
-            return;
-
-        if (!activeCityRef.current) {
-            setActiveCity(predictedCitiesRef.current[0]);
-            return;
-        }
-
-        const selectedCityIndex = predictedCitiesRef.current.findIndex(x => x.id === activeCityRef.current.id);
+        const selectedCityIndex = predictedCities.findIndex(x => x.id === activeCity.id);
         if (e.key === 'ArrowUp' && selectedCityIndex > 0)
-            setActiveCity(predictedCitiesRef.current[selectedCityIndex - 1]);
+            setActiveCity(predictedCities[selectedCityIndex - 1]);
 
-        if (e.key === 'ArrowDown' && selectedCityIndex < predictedCitiesRef.current.length - 1)
-            setActiveCity(predictedCitiesRef.current[selectedCityIndex + 1]);
+        if (e.key === 'ArrowDown' && selectedCityIndex < predictedCities.length - 1)
+            setActiveCity(predictedCities[selectedCityIndex + 1]);
     };
-
-    useEffect(() => {
-        inputRef.current.addEventListener('input', (e) => handleInput(e));
-        inputRef.current.addEventListener('keydown', (e) => handleKeyPress(e));
-    }, []);
-
-
-    useEffect(() => {
-        if (activeCity)
-            inputRef.current.value = activeCity.name;
-    }, [activeCity]);
 
     const selectedCities = selectedCitiesList.map(x =>
-        <li key={x.id} className="selected-cities__item">{x.name}</li>);
+        <li key={x.id}
+            className={
+                `selected-cities__item ${activeCity && x.id === activeCity.id ? 'selected-cities__item_highlited'
+                    : null}`
+            }
+        >{x.name}</li>);
 
     const citiesItems = predictedCities.map(x =>
-        <li key={x.id} className={`city-selector__item ${activeCity && activeCity.id === x.id ? 'hover' : null}`}
+        <li key={x.id}
+            className={
+                `city-selector__item ${activeCity && activeCity.id === x.id ? 'city-selector__item_hovered'
+                    : null}`
+            }
             onClick={() => selectCity(x.id, x.name)}>{x.name}</li>
     );
 
@@ -89,7 +77,12 @@ function CitySelector() {
         <React.Fragment>
             <div className="city-selector">
                 <div className="city-selector__form">
-                    <input className="city-selector__input" placeholder="Select city" ref={inputRef}/>
+                    <input className="city-selector__input"
+                           placeholder="Select city"
+                           value={inputData}
+                           onInput={(e) => setInputData(e.target.value)}
+                           onKeyDown={(e) => handleKeyDown(e)}
+                    />
                     <button className="city-selector__button" onClick={() => addCityToList()}>Добавить</button>
                 </div>
                 {
