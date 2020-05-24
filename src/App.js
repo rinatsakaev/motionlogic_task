@@ -51,6 +51,7 @@ const data = [
         name: 'Агрыз'
     }
 ];
+
 export const SelectorContext = React.createContext(data);
 
 function App() {
@@ -62,4 +63,5 @@ function App() {
         </div>
     );
 }
+
 export default App;

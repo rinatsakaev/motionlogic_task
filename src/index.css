@@ -32,26 +32,27 @@
     cursor: pointer;
 }
 
-.city-selector__item:hover, .city-selector__item_hovered {
+.city-selector__item:hover,
+.city-selector__item_hovered {
     color: white;
     background-color: mediumslateblue;
 }
 
-.selected-cities{
+.selected-cities {
     list-style: none;
     display: flex;
     padding: 0;
     flex-wrap: wrap;
 }
-.selected-cities__item
-{
+
+.selected-cities__item {
     padding: 5px;
     border: 1px solid gray;
     border-radius: 5px;
     margin: 0 10px 10px 0;
 }
-.selected-cities__item_highlited
-{
+
+.selected-cities__item_highlited {
     border-color: green;
     border-width: 2px;
 }
