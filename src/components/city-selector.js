@@ -60,13 +60,24 @@ function CitySelector() {
         }
     };
 
+    const removeFromList = (id) => {
+        setSelectedCities((prevState) => {
+            const index = prevState.findIndex(x => x.id === id);
+            return [...prevState.slice(0, index), ...prevState.slice(index + 1)]
+        })
+    };
+
     const selectedCitiesItems = selectedCities.map(x =>
         <li key={x.id}
             className={
                 `selected-cities__item ${activeCity && x.id === activeCity.id ? 'selected-cities__item_highlited'
                     : null}`
-            }
-        >{x.name}</li>);
+            }>
+            <img src={'close.svg'} className='selected-cities__remove-icon' alt='Удалить'
+                 onClick={() => removeFromList(x.id)} />
+            {x.name}
+        </li>);
+
 
     const predictedCitiesItems = predictedCities.map(x =>
         <li key={x.id}
@@ -74,7 +85,9 @@ function CitySelector() {
                 `city-selector__item ${activeCity && activeCity.id === x.id ? 'city-selector__item_hovered'
                     : null}`
             }
-            onClick={() => selectCity(x.id, x.name)}>{x.name}</li>
+            onClick={() => selectCity(x.id, x.name)}>
+            {x.name}
+        </li>
     );
 
     return (
