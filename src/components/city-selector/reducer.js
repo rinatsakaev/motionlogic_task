@@ -37,7 +37,7 @@ export function reducer(state, action) {
                 ...state,
                 predictedCities: predictedCities
             };
-        case 'REMOVE': {
+        case 'REMOVE_CITY': {
             const index = state.selectedCities.findIndex(x => x.id === action.payload.id);
             const selectedCities = [...state.selectedCities.slice(0, index), ...state.selectedCities.slice(index + 1)];
             sessionStorage.setItem('selectedCities', JSON.stringify(selectedCities));
