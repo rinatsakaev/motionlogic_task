@@ -6,13 +6,6 @@ function CitySelector() {
     const cities = useContext(SelectorContext);
     const [{activeCity, predictedCities, selectedCities, inputValue}, dispatch] = useReducer(reducer, initialState());
 
-    const addCityToList = () => {
-        if (!activeCity || selectedCities.findIndex(x => x.id === activeCity.id) !== -1)
-            return;
-
-        dispatch({type: 'ADD_CITY'});
-    };
-
     useEffect(() => {
         if (inputValue.length < 3)
             dispatch({type: 'RESET'});
@@ -24,6 +17,13 @@ function CitySelector() {
                 }
             });
     }, [inputValue, cities]);
+
+    const addCityToList = () => {
+        if (!activeCity || selectedCities.findIndex(x => x.id === activeCity.id) !== -1)
+            return;
+
+        dispatch({type: 'ADD_CITY'});
+    };
 
     const handleKeyDown = (e) => {
         if (predictedCities.length === 0 || !['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key))
@@ -76,6 +76,7 @@ function CitySelector() {
                  onClick={() => dispatch({type: 'REMOVE', payload: {id: x.id}})}/>
             {x.name}
         </li>);
+    
     const predictedCitiesItems = predictedCities.map(x =>
         <li key={x.id}
             className={
