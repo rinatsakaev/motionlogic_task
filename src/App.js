@@ -1,5 +1,5 @@
 import React from 'react';
-import CitySelector from './components/city-selector';
+import CitySelector from './components/city-selector/city-selector';
 
 const data = [
     {
