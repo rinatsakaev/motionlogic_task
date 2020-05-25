@@ -73,10 +73,10 @@ function CitySelector() {
                     : null}`
             }>
             <img src={'close.svg'} className='selected-cities__remove-icon' alt='Удалить'
-                 onClick={() => dispatch({type: 'REMOVE', payload: {id: x.id}})}/>
+                 onClick={() => dispatch({type: 'REMOVE_CITY', payload: {id: x.id}})}/>
             {x.name}
         </li>);
-    
+
     const predictedCitiesItems = predictedCities.map(x =>
         <li key={x.id}
             className={
