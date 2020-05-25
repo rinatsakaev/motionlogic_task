@@ -1,44 +1,40 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import {SelectorContext} from '../App';
-import useSessionState from '../hooks/session-state';
+import React, {useContext, useEffect, useReducer} from 'react';
+import {SelectorContext} from '../../App';
+import {reducer, initialState} from './reducer';
 
 function CitySelector() {
     const cities = useContext(SelectorContext);
-    const [selectedCities, setSelectedCities] = useSessionState('list', []);
-    const [inputValue, setInputValue] = useState('');
-    const [activeCity, setActiveCity] = useState(undefined);
-    const [predictedCities, setPredictedCities] = useState([]);
+    const [{activeCity, predictedCities, selectedCities, inputValue}, dispatch] = useReducer(reducer, initialState());
+
+    useEffect(() => {
+        if (inputValue.length < 3)
+            dispatch({type: 'RESET'});
+        else
+            dispatch({
+                type: 'PREDICT_CITIES',
+                payload: {
+                    predictedCities: cities.filter(x => x.name.startsWith(inputValue))
+                }
+            });
+    }, [inputValue, cities]);
 
     const addCityToList = () => {
         if (!activeCity || selectedCities.findIndex(x => x.id === activeCity.id) !== -1)
             return;
 
-        setSelectedCities((prevState) => [...prevState, activeCity]);
-        setPredictedCities([]);
-        setInputValue('');
+        dispatch({type: 'ADD_CITY'});
     };
-
-    const selectCity = (id, name) => {
-        setActiveCity({id, name});
-        setInputValue(name);
-    };
-
-    useEffect(() => {
-        if (inputValue.length < 3) {
-            if (predictedCities.length)
-                setPredictedCities([]);
-            if (activeCity)
-                setActiveCity(undefined);
-        } else
-            setPredictedCities(cities.filter(x => x.name.startsWith(inputValue)));
-    }, [inputValue]);
 
     const handleKeyDown = (e) => {
-        if (predictedCities.length === 0)
+        if (predictedCities.length === 0 || !['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key))
             return;
 
         if (!activeCity) {
-            setActiveCity(predictedCities[0]);
+            dispatch({
+                type: 'SET_ACTIVE_CITY', payload: {
+                    activeCity: predictedCities[0]
+                }
+            });
             return;
         }
 
@@ -49,22 +45,25 @@ function CitySelector() {
                 break;
             case 'ArrowUp':
                 if (activeCityIndex > 0)
-                    setActiveCity(predictedCities[activeCityIndex - 1]);
+                    dispatch({
+                        type: 'SET_ACTIVE_CITY',
+                        payload: {
+                            activeCity: predictedCities[activeCityIndex - 1]
+                        }
+                    });
                 break;
             case 'ArrowDown':
                 if (activeCityIndex < predictedCities.length - 1)
-                    setActiveCity(predictedCities[activeCityIndex + 1]);
+                    dispatch({
+                        type: 'SET_ACTIVE_CITY',
+                        payload: {
+                            activeCity: predictedCities[activeCityIndex + 1]
+                        }
+                    });
                 break;
             default:
                 return;
         }
-    };
-
-    const removeFromList = (id) => {
-        setSelectedCities((prevState) => {
-            const index = prevState.findIndex(x => x.id === id);
-            return [...prevState.slice(0, index), ...prevState.slice(index + 1)]
-        })
     };
 
     const selectedCitiesItems = selectedCities.map(x =>
@@ -74,18 +73,17 @@ function CitySelector() {
                     : null}`
             }>
             <img src={'close.svg'} className='selected-cities__remove-icon' alt='Удалить'
-                 onClick={() => removeFromList(x.id)} />
+                 onClick={() => dispatch({type: 'REMOVE', payload: {id: x.id}})}/>
             {x.name}
         </li>);
-
-
+    
     const predictedCitiesItems = predictedCities.map(x =>
         <li key={x.id}
             className={
                 `city-selector__item ${activeCity && activeCity.id === x.id ? 'city-selector__item_hovered'
                     : null}`
             }
-            onClick={() => selectCity(x.id, x.name)}>
+            onClick={() => dispatch({type: 'SELECT_CITY', payload: {activeCity: x}})}>
             {x.name}
         </li>
     );
@@ -97,7 +95,12 @@ function CitySelector() {
                     <input className="city-selector__input"
                            placeholder="Select city"
                            value={inputValue}
-                           onInput={(e) => setInputValue(e.target.value)}
+                           onInput={(e) => dispatch({
+                               type: 'CHANGE_INPUT',
+                               payload: {
+                                   inputValue: e.target.value
+                               }
+                           })}
                            onKeyDown={(e) => handleKeyDown(e)}
                     />
                     <button className="city-selector__button" onClick={() => addCityToList()}>Добавить</button>
