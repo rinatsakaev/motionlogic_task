@@ -1,0 +1,43 @@
+{
+  "eslintConfig": {
+    "extends": "react-app",
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ],
+    "eol-last": [
+      "error",
+      "always"
+    ],
+    "quotes": [
+      "warn",
+      "single"
+    ],
+    "padding-line-between-statements": [
+      "warn",
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": "return"
+      },
+      {
+        "blankLine": "always",
+        "prev": "block-like",
+        "next": "*"
+      }
+    ],
+    "padded-blocks": [
+      "error",
+      "never"
+    ],
+    "curly": [
+      "error",
+      "multi-or-nest"
+    ],
+    "eqeqeq": [
+      "error"
+    ]
+  }
+}
