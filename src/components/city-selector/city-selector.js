@@ -25,6 +25,12 @@ function CitySelector() {
         dispatch({type: 'ADD_CITY'});
     };
 
+    const makeScroll = () => {
+        const citySelectorList = document.querySelector('.city-selector__list');
+        const selectedCityItem = document.querySelector('.city-selector__item_hovered');
+        citySelectorList.scrollTop = selectedCityItem.offsetTop - citySelectorList.clientHeight;
+    };
+
     const handleKeyDown = (e) => {
         if (predictedCities.length === 0 || !['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key))
             return;
@@ -44,23 +50,29 @@ function CitySelector() {
                 addCityToList();
                 break;
             case 'ArrowUp':
-                if (activeCityIndex > 0)
+                if (activeCityIndex > 0) {
                     dispatch({
                         type: 'SET_ACTIVE_CITY',
                         payload: {
                             activeCity: predictedCities[activeCityIndex - 1]
                         }
                     });
+                    makeScroll();
+                }
                 break;
+
             case 'ArrowDown':
-                if (activeCityIndex < predictedCities.length - 1)
+                if (activeCityIndex < predictedCities.length - 1) {
                     dispatch({
                         type: 'SET_ACTIVE_CITY',
                         payload: {
                             activeCity: predictedCities[activeCityIndex + 1]
                         }
                     });
+                    makeScroll();
+                }
                 break;
+
             default:
                 return;
         }
