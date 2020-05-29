@@ -1,6 +1,7 @@
+import ActionTypes from './types'
 export function reducer(state, action) {
     switch (action.type) {
-        case 'SELECT_CITY': {
+        case ActionTypes.SELECT_CITY: {
             const {activeCity} = action.payload;
             return {
                 ...state,
@@ -8,14 +9,14 @@ export function reducer(state, action) {
                 inputValue: activeCity.name
             };
         }
-        case 'SET_ACTIVE_CITY': {
+        case ActionTypes.SET_ACTIVE_CITY: {
             const {activeCity} = action.payload;
             return {
                 ...state,
                 activeCity
             };
         }
-        case 'ADD_CITY': {
+        case ActionTypes.ADD_CITY: {
             const selectedCities = [...state.selectedCities, state.activeCity];
             sessionStorage.setItem('selectedCities', JSON.stringify(selectedCities));
             return {
@@ -25,19 +26,19 @@ export function reducer(state, action) {
                 predictedCities: []
             };
         }
-        case 'CHANGE_INPUT':
+        case ActionTypes.CHANGE_INPUT:
             const {inputValue} = action.payload;
             return {
                 ...state,
                 inputValue
             };
-        case 'PREDICT_CITIES':
+        case ActionTypes.PREDICT_CITIES:
             const {predictedCities} = action.payload;
             return {
                 ...state,
                 predictedCities: predictedCities
             };
-        case 'REMOVE_CITY': {
+        case ActionTypes.REMOVE_CITY: {
             const index = state.selectedCities.findIndex(x => x.id === action.payload.id);
             const selectedCities = [...state.selectedCities.slice(0, index), ...state.selectedCities.slice(index + 1)];
             sessionStorage.setItem('selectedCities', JSON.stringify(selectedCities));
@@ -46,7 +47,7 @@ export function reducer(state, action) {
                 selectedCities
             };
         }
-        case 'RESET':
+        case ActionTypes.RESET:
             return {
                 ...state,
                 predictedCities: [],

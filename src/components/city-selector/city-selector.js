@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useReducer} from 'react';
 import {SelectorContext} from '../../App';
 import {reducer, initialState} from './reducer';
+import ActionTypes from './types';
 
 function CitySelector() {
     const cities = useContext(SelectorContext);
@@ -8,10 +9,10 @@ function CitySelector() {
 
     useEffect(() => {
         if (inputValue.length < 3)
-            dispatch({type: 'RESET'});
+            dispatch({type: ActionTypes.RESET});
         else
             dispatch({
-                type: 'PREDICT_CITIES',
+                type: ActionTypes.PREDICT_CITIES,
                 payload: {
                     predictedCities: cities.filter(x => x.name.startsWith(inputValue))
                 }
@@ -22,7 +23,7 @@ function CitySelector() {
         if (!activeCity || selectedCities.findIndex(x => x.id === activeCity.id) !== -1)
             return;
 
-        dispatch({type: 'ADD_CITY'});
+        dispatch({type: ActionTypes.ADD_CITY});
     };
 
     const makeScroll = () => {
@@ -37,7 +38,7 @@ function CitySelector() {
 
         if (!activeCity) {
             dispatch({
-                type: 'SET_ACTIVE_CITY', payload: {
+                type: ActionTypes.SET_ACTIVE_CITY, payload: {
                     activeCity: predictedCities[0]
                 }
             });
@@ -52,7 +53,7 @@ function CitySelector() {
             case 'ArrowUp':
                 if (activeCityIndex > 0) {
                     dispatch({
-                        type: 'SET_ACTIVE_CITY',
+                        type: ActionTypes.SET_ACTIVE_CITY,
                         payload: {
                             activeCity: predictedCities[activeCityIndex - 1]
                         }
@@ -64,7 +65,7 @@ function CitySelector() {
             case 'ArrowDown':
                 if (activeCityIndex < predictedCities.length - 1) {
                     dispatch({
-                        type: 'SET_ACTIVE_CITY',
+                        type: ActionTypes.SET_ACTIVE_CITY,
                         payload: {
                             activeCity: predictedCities[activeCityIndex + 1]
                         }
@@ -85,7 +86,7 @@ function CitySelector() {
                     : null}`
             }>
             <img src={'close.svg'} className='selected-cities__remove-icon' alt='Удалить'
-                 onClick={() => dispatch({type: 'REMOVE_CITY', payload: {id: x.id}})}/>
+                 onClick={() => dispatch({type: ActionTypes.REMOVE_CITY, payload: {id: x.id}})}/>
             {x.name}
         </li>);
 
@@ -95,7 +96,7 @@ function CitySelector() {
                 `city-selector__item ${activeCity && activeCity.id === x.id ? 'city-selector__item_hovered'
                     : null}`
             }
-            onClick={() => dispatch({type: 'SELECT_CITY', payload: {activeCity: x}})}>
+            onClick={() => dispatch({type: ActionTypes.SELECT_CITY, payload: {activeCity: x}})}>
             {x.name}
         </li>
     );
@@ -108,7 +109,7 @@ function CitySelector() {
                            placeholder="Select city"
                            value={inputValue}
                            onInput={(e) => dispatch({
-                               type: 'CHANGE_INPUT',
+                               type: ActionTypes.CHANGE_INPUT,
                                payload: {
                                    inputValue: e.target.value
                                }
